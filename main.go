@@ -80,7 +80,9 @@ func main() {
 	}
 
 	// Start processing existing files in background
-	go processExistingFiles(&config)
+	if cfg.Flow.ClearBacklog {
+		go processExistingFiles(&config)
+	}
 
 	// Setup the directory watcher
 	watcher, err := fsnotify.NewWatcher()
