@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/srivinprabhash/flow-sftp/config"
@@ -39,6 +41,43 @@ func init() {
 	}
 }
 
+func backupFile(fp string, cfg *config.Configuration) error {
+
+	// Get abs paths
+	sourcePath := fp
+	destination := cfg.Flow.Backups
+	fileName := filepath.Base(sourcePath)
+	destinationFilePath := filepath.Join(destination, fileName)
+
+	// Open the source file
+	sourceFile, err := os.Open(sourcePath)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	// Create destination file
+	destinationFile, err := os.Create(destinationFilePath)
+	if err != nil {
+		return err
+	}
+	defer destinationFile.Close()
+
+	// Copy content
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return err
+	}
+
+	// Remove source
+	err = os.Remove(sourcePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 /*
 Process existing files
 */
@@ -56,16 +95,20 @@ func processExistingFiles(cfg *config.Configuration) {
 		// Concatnate file path
 		fp := cfg.Flow.Source + file.Name()
 
-		// Send File to SFTP Server
+		// // Send File to SFTP Server
 		err = send.Send(fp, cfg)
 		if err != nil {
 			log.Fatalln("ERROR :: Could not send :: ", err)
 		}
-		log.Println("Successfully moved file :: ", fp)
 
-		/*
-			TODO :: Implement Backup mechanism
-		*/
+		// Check if backup is enabled
+		if cfg.Flow.EnableBackups {
+			err := backupFile(fp, cfg)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			log.Println("File backed up successfully :: ", fp)
+		}
 
 	}
 
@@ -113,6 +156,13 @@ func main() {
 				/*
 					TODO :: Implement Backup Mechanism
 				*/
+				if cfg.Flow.EnableBackups {
+					err := backupFile(event.Name, &config)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("File backed up successfully :: ", event.Name)
+				}
 
 			}
 

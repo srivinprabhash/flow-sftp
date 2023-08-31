@@ -15,10 +15,10 @@ type SFTPConnection struct {
 }
 
 type FlowConfiguration struct {
-	Source          string `mapstrucutre:"source"`
-	EnableBackups   bool   `mapstrucutre:"enableBackups"`
-	BackupDirectory string `mapstrucutre:"backupDir"`
-	ClearBacklog    bool   `mapstructure:"clearBacklog"`
+	Source        string `mapstrucutre:"source"`
+	EnableBackups bool   `mapstrucutre:"enableBackups"`
+	ClearBacklog  bool   `mapstructure:"clearBacklog"`
+	Backups       string `mapstructure:"backups"`
 }
 
 type Configuration struct {
