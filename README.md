@@ -8,7 +8,7 @@ Flow SFTP can watch a directory for new files and upload them to a remote SFTP h
 - Copy new files almost in real time.
 - Configurable via a yaml config file.
 - Clear backlog files.
-- Backup files to a separate directory. (*Coming up*)
+- Backup files to a separate directory.
 
 ## ⚙️ Configuration
 
