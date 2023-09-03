@@ -153,9 +153,7 @@ func main() {
 				}
 				log.Println("Successfully moved file :: ", event.Name)
 
-				/*
-					TODO :: Implement Backup Mechanism
-				*/
+				// Backing up file
 				if cfg.Flow.EnableBackups {
 					err := backupFile(event.Name, &config)
 					if err != nil {
