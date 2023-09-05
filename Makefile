@@ -4,4 +4,4 @@ run:
 	go run main.go
 
 build:
-	go build -o build/flow-sftp
+	CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o build/flow-sftp
