@@ -15,7 +15,7 @@ Flow SFTP can watch a directory for new files and upload them to a remote SFTP h
 ```yaml
 flow:
   source: "/path/to/directory/" # Path to the directory you want to watch for
-  backupDir: "/path/to/directory/" # Path to your backup directory 
+  backups: "/path/to/directory/" # Path to your backup directory 
   enableBackups: false # Enable/Disable backups
   clearBacklog: false # Enable/Disable backlog clear. It is recomended to keep this disabled if backup is not enabled.
 
