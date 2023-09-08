@@ -10,16 +10,16 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func getConnection(cfg *config.Configuration) (*ssh.Client, error) {
+func getConnection(flow *config.Flow) (*ssh.Client, error) {
 
 	// Read Config
-	var config, err = config.ReadConfig()
-	if err != nil {
-		return nil, err
-	}
+	// var config, err = config.ReadConfig()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Read private key file
-	pk, err := ioutil.ReadFile(config.SFTPConnection.PrivateKey)
+	pk, err := ioutil.ReadFile(flow.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func getConnection(cfg *config.Configuration) (*ssh.Client, error) {
 
 	// SSH Configurtions
 	sshConfig := &ssh.ClientConfig{
-		User:            config.SFTPConnection.User,
+		User:            flow.RemoteUser,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
@@ -40,17 +40,17 @@ func getConnection(cfg *config.Configuration) (*ssh.Client, error) {
 	}
 
 	// Dial the SSH Connection
-	conn, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", config.SFTPConnection.Host, config.SFTPConnection.Port), sshConfig)
+	conn, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", flow.RemoteHost, flow.RemotePort), sshConfig)
 	if err != nil {
 		return nil, err
 	}
 	return conn, nil
 }
 
-func Send(fp string, cfg *config.Configuration) error {
+func Send(fp string, flow *config.Flow) error {
 
 	// Get a SSH connection
-	conn, err := getConnection(cfg)
+	conn, err := getConnection(flow)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func Send(fp string, cfg *config.Configuration) error {
 
 	// Upload file
 	rfn := filepath.Base(fp)
-	rfp := filepath.Join(cfg.SFTPConnection.RemotePath, rfn)
+	rfp := filepath.Join(flow.RemoteDirectory, rfn)
 	rf, err := client.Create(rfp)
 	if err != nil {
 		return err
