@@ -1,12 +1,11 @@
-flow:
-  source: "/path/to/directory/" # Path to the directory you want to watch for
-  backups: "/path/to/directory/" # Path to your backup directory 
-  enableBackups: false # Enable/Disable backups
-  clearBacklog: false # Enable/Disable backlog clear. It is recomended to keep this disabled if backup is not enabled.
-
-sftp:
-  host: "" # Remote SFTP Host Name/IP
-  port: 22 # Remote SFTP Host Port 
-  user: "srivin" # Remote SFTP User
-  privateKey: "/path/to/file" # SSH Private Key file path 
-  remotePath: "/path/to/directory/" # Destination directory in the remote SFTP host
+flows:
+  - name: "Flow One" # Flow Name
+    source_dir: "/home/srivin/Dev/go/src/flow-sftp/testDir/" # Path to the directory you want to watch for
+    backup_dir: "/home/srivin/Dev/go/src/flow-sftp/backups/" # Path to your backup directory 
+    enable_backup: true # Enable/Disable backups
+    clear_backlog: true # Enable/Disable backlog clear. It is recomended to keep this disabled if backup is not enabled.
+    remote_host: "172.16.10.108" # Remote SFTP Host Name/IP
+    remote_port: 22 # Remote SFTP Host Port 
+    remote_user: "srivin" # Remote SFTP User
+    private_key: "/home/srivin/.ssh/SRIVINPRABHASH" # SSH Private Key file path 
+    remote_dir: "/home/srivin/sftp/" # Destination directory in the remote SFTP host
