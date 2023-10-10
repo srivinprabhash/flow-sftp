@@ -47,6 +47,7 @@ func (f *Flow) Run(cfg *FlowConfiguration, wg *sync.WaitGroup, messages chan err
 	if err != nil {
 		messages <- err
 	}
+	defer w.Close()
 
 	// Start watching
 	err = w.Add(f.SourceDirectory)
@@ -56,30 +57,35 @@ func (f *Flow) Run(cfg *FlowConfiguration, wg *sync.WaitGroup, messages chan err
 
 	log.Println("[INFO] :: Watching directory ::", f.SourceDirectory)
 
-	for {
-		select {
-		case event := <-w.Events:
-			if event.Op&fsnotify.Create == fsnotify.Create {
+	go func() {
+		for {
+			select {
+			case event := <-w.Events:
+				if event.Op&fsnotify.Create == fsnotify.Create {
 
-				// New file identified
-				log.Println("[INFO] :: New file detected.", event.Name)
-				// Send file to the SFTP Server
-				err = Send(event.Name, f)
-				if err != nil {
-					messages <- err
-				}
-				log.Println("[INFO] :: Successfully moved file :: ", event.Name)
-
-				// Backing Up File
-				if f.EnableBackup {
-					if err := f.backupFile(event.Name); err != nil {
+					// New file identified
+					log.Println("[INFO] :: New file detected.", event.Name)
+					// Send file to the SFTP Server
+					err = Send(event.Name, f)
+					if err != nil {
 						messages <- err
 					}
-				}
+					log.Println("[INFO] :: Successfully moved file :: ", event.Name)
 
+					// Backing Up File
+					if f.EnableBackup {
+						if err := f.backupFile(event.Name); err != nil {
+							messages <- err
+						}
+					}
+
+				}
 			}
 		}
-	}
+	}()
+
+	// Block main goroutine
+	<-make(chan struct{})
 }
 
 // Clear the back log of files in the source directory.
