@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -31,7 +30,7 @@ type Flow struct {
 // FlowConfiguration's SourceDirectory. Once a new file
 // is found, it sends to the SFTP host and backup the file
 // if it is enabled.
-func (f *Flow) Run(cfg *FlowConfiguration, wg *sync.WaitGroup, messages chan error) {
+func (f *Flow) Run(messages chan error) {
 
 	log.Println("[INFO] :: Start running flow :: ", f.Name)
 
