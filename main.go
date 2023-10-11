@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"sync"
 )
 
 // func init() {
@@ -52,20 +51,16 @@ func main() {
 	// Make Run error channel
 	error_chan := make(chan error)
 
-	// Create waitGroup
-	var wg sync.WaitGroup
-
 	for _, flow := range cfg.Flows {
 
+		thisFlow := flow
+
 		// Run each flow
-		go flow.Run(&cfg, &wg, error_chan)
-		wg.Add(1)
+		go thisFlow.Run(error_chan)
 
 	}
 
 	error_msg := <-error_chan
 	log.Println(error_msg)
-
-	wg.Wait()
 
 }
